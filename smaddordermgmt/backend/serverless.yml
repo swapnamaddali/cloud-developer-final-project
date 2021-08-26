@@ -1,0 +1,302 @@
+service:
+  name: serverless-ordermgmt-app
+
+plugins:
+  - serverless-webpack
+  - serverless-reqvalidator-plugin
+  - serverless-iam-roles-per-function
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+  stage: ${opt:stage, 'prod'}
+  region: ${opt:region, 'us-east-1'}
+
+  environment:
+    ORDERS_TABLE: smadd_orders_${self:provider.stage}
+    PRODUCTS_TABLE: smadd_products_${self:provider.stage}
+    USER_ID_INDEX: UserIdIndex
+    #CONNECTIONS_TABLE: Connections-${self:provider.stage}
+    PRODUCT_IMAGES_S3_BUCKET: ordermgmt-product-images-${self:provider.stage}
+    SIGNED_URL_EXPIRATION: 300
+    #AUTH_0_SECRET_ID: Auth0Secret-${self:provider.stage}
+    #AUTH_0_SECRET_FIELD: auth0Secret
+    AUTH_0_SECRET: kNpTRfFYkyPXPQj7-F0TGIFPXyzlFIG4mIHAbruumGqrwvgzT6sXN-FIydUBHbb4
+  
+  tracing:
+    lambda: true
+    apiGateway: true
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'xray:PutTraceSegments'
+        - 'xray:PutTelemetryRecords'
+      Resource:
+        - '*' 
+    - Effect: Allow
+      Action:
+        - 'logs:PutLogEvents'
+        - 'logs:CreateLogStream'
+        - 'logs:CreateLogGroup'
+      Resource:
+        - '*'  
+
+functions:
+  Auth:
+    handler: src/lambda/auth/auth0Authorizer.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
+
+  GetOrders:
+    handler: src/lambda/http/getOrders.handler
+    events:
+      - http:
+          method: get
+          path: orders
+          cors: true
+          authorizer: Auth
+    iamRoleStatementsName: Query-DynamoDB-orders-Table
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+          - dynamodb:Query
+          - dynamodb:Scan
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ORDERS_TABLE}
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ORDERS_TABLE}/index/${self:provider.environment.USER_ID_INDEX}
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
+
+     
+  # TODO: Configure this function - 
+  # Provide iamRoleStatements property. Decide the Actions and AWS Resource. 
+  # To refer to an AWS resource defined in the "Resources" section, you can use "Resource: !GetAtt <resource-name>.Arn"
+  # To validate incoming HTTP requests, we have provided the request schemas in function definition below. 
+  CreateOrder:
+    handler: src/lambda/http/createOrder.handler
+    events:
+      - http:
+          method: post
+          path: orders
+          cors: true
+          request:
+            schema:
+              application/json: ${file(src/models/create-order-model.json)}
+          authorizer: Auth
+    iamRoleStatementsName: Put-Into-DynamoDB-orders-Table
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ORDERS_TABLE}
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
+
+  UpdateOrder:
+    handler: src/lambda/http/updateOrder.handler
+    events:
+      - http:
+          method: patch
+          path: orders/{orderId}
+          cors: true
+          authorizer: Auth
+          request:
+            schema:
+              application/json: ${file(src/models/update-order-model.json)}
+    iamRoleStatementsName: Update-DynamoDB-Orders-Table
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ORDERS_TABLE}
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
+
+  DeleteOrder:
+    handler: src/lambda/http/deleteOrder.handler
+    events:
+      - http:
+          method: delete
+          path: orders/{orderId}
+          cors: true
+          authorizer: Auth
+    iamRoleStatementsName: Delete-from-DynamoDB-Orders-Table
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ORDERS_TABLE}
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
+
+  GenerateProdUploadUrl:
+    handler: src/lambda/http/genProdUploadUrl.handler
+    events:
+      - http:
+          method: post
+          path: products/{pid}/attachment
+          cors: true
+          authorizer: Auth
+    iamRoleStatementsName: Get-S3-Images-Bucket-Update-Product-Table
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+          - s3:GetObject
+        Resource: arn:aws:s3:::${self:provider.environment.PRODUCT_IMAGES_S3_BUCKET}/*
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
+  CreateProduct:
+    handler: src/lambda/http/createProduct.handler
+    events:
+      - http:
+          method: post
+          path: products
+          cors: true
+          request:
+            schema:
+              application/json: ${file(src/models/create-product-model.json)}
+          authorizer: Auth
+    iamRoleStatementsName: Put-Into-DynamoDB-products-Table
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: ApiGatewayRestApi
+
+    OrdersDynamoDBTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: orderId
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+          - AttributeName: quantity
+            AttributeType: S
+        KeySchema:
+          - AttributeName: orderId
+            KeyType: HASH
+          - AttributeName: userId
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.ORDERS_TABLE}
+        GlobalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.USER_ID_INDEX}
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+    ProductsDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: pid
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pid
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.PRODUCTS_TABLE}
+
+    AttachmentsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.PRODUCT_IMAGES_S3_BUCKET}
+        CorsConfiguration:
+          CorsRules:
+            -
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000
+
+    BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        PolicyDocument:
+          Id: MyImagesPolicy
+          Version: "2012-10-17"
+          Statement:
+            - Sid: PublicReadForGetBucketObjects
+              Effect: Allow
+              Principal: '*'
+              Action: 's3:GetObject'
+              Resource: 'arn:aws:s3:::${self:provider.environment.PRODUCT_IMAGES_S3_BUCKET}/*'
+        Bucket: !Ref AttachmentsBucket 
+    # Auth0Secret:
+    #   Type: AWS::SecretsManager::Secret
+    #   Properties:
+    #     Name: ${self:provider.environment.AUTH_0_SECRET_ID}
+    #     Description: Auth0 secret
+    #     #KmsKeyId: !Ref KMSKey

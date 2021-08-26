@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "updorder",
+    "type": "object",
+    "properties": {
+        "userEmail": {
+            "type": "string"
+        },
+        "productId": {
+            "type": "string"
+        },
+        "quantity": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "userEmail",
+        "productId",
+        "quantity"
+    ],
+    "additionalProperties": false
+}

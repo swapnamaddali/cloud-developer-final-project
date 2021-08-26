@@ -1,0 +1,18 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "crorders",
+    "type": "object",
+    "properties": {
+        "productId": {
+            "type": "string"
+        },
+        "userEmail": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "productId",
+        "userEmail"
+    ],
+    "additionalProperties": false
+}
