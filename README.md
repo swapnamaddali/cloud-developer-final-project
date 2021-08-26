@@ -1,18 +1,17 @@
-# cloud-developer capstone project
-Content for Udacity's cloud developer nanodegree
+# Cloud-Developer Capstone Project - Order Product Management Backend APIs
 
-# code structure
-cloud-developer-final-project/smaddordermgmt/backend holds the back end code of the Product/Order Management APIs
-It uses serverless yaml to expose 6 end points to perform various operations required
+Project has back end code for the Product/Order Management application.
+APIs are exposed as AWS Lambda functions using serverless yaml which has 6 end points to perform various operations required.
 
+# Code Structure
 # How to build and deploy as Lambda Functions to AWS
-$ cd cloud-developer-final-project/smaddordermgmt/backend
-$ npm install
-$ sls deploy -v
+# $ cd cloud-developer-final-project/smaddordermgmt/backend
+# $ npm install
+# $ sls deploy -v
 
 
 # Serverless Order Management app
- The backend for the project can be used for Order and Product management app
+ The backend for the project can be used for Order and Product management app.
 
 ### Order:
    # Need write:order permissions to Get (specfic user)/create/delete (specific user) order
@@ -52,7 +51,7 @@ $ sls deploy -v
 
 ## Upload file to Binary to an associated Product
 
-In the post man collections 
+In the post man collections, please make sure the S3 URL Test is updated with a proper file from the filesystem under binary input.
 
 
 
