@@ -3,11 +3,10 @@
 Project has back end code for the Product/Order Management application.
 APIs are exposed as AWS Lambda functions using serverless yaml which has 6 end points to perform various operations required.
 
-# Code Structure
-# How to build and deploy as Lambda Functions to AWS
-# $ cd cloud-developer-final-project/smaddordermgmt/backend
-# $ npm install
-# $ sls deploy -v
+## How to build and deploy as Lambda Functions to AWS
+### $ cd cloud-developer-final-project/smaddordermgmt/backend
+### $ npm install
+### $ sls deploy -v
 
 
 # Serverless Order Management app
