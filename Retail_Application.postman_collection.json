@@ -1,0 +1,398 @@
+{
+	"info": {
+		"_postman_id": "82da666d-d0fb-4400-a972-d648555856f9",
+		"name": "Retail_Application",
+		"description": "Please run the collection to test API endpoints exposed using AWS Lambda Functions.\n\n**NOTE** \nFor S3 Upload Test, choose a file from your local filesystem.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "OrderManagement",
+			"item": [
+				{
+					"name": "Get Orders for specific user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"value contains items array\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.items).to.be.an('array')",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imp6WVo1Ul9HYUZnMUZKREVNU2tZdyJ9.eyJpc3MiOiJodHRwczovL2Rldi0xbmk5LW93eS51cy5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NjEyNTFkZDgzY2FhYmEwMDY5YjZkZGQwIiwiYXVkIjoiaHR0cHM6Ly9vcmRlcm1nbXRhcGkiLCJpYXQiOjE2Mjk5NDU1MzMsImV4cCI6MTYzMDAzMTkzMywiYXpwIjoic244SHdJWlRmRVJGSXFKVFI0OWxMeFVabFE1eE54bFIiLCJzY29wZSI6IndyaXRlOm9yZGVycyIsImd0eSI6InBhc3N3b3JkIn0.bIFggQnS2zNWo7AeQW2G_sKJFDNhsWol6s20lBTm-yF5kknJJna_A3TTaVHkx5-jziImjV_JwW_58gG68nR4Lwnvka5clqykRstRCXK4pqt0iZWz5lxLgEseVyoniimgqvaTWr0t_fsQC9YV7ki5hMpWFyg0tbSnS4NrjZDUfMy6s3yzAa5LA1rQW6kL1CSvLhi7X2Z5V3CBWghHmHcOFYXjMsqS34ZAdrAs8loTD7UKAzri8YHwiQ1s2vYiV6x_pDOIo1gCM0oqz87bYGS2fW1RRUp3v0mAySpvgBfuD1Fw51-loc9__cXjSBFHn7o0-DaaPkxj0EivkEwByJ_mIg",
+								"type": "text"
+							}
+						],
+						"url": "https://{{apiOrder}}.execute-api.us-east-1.amazonaws.com/prod/orders"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Order",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let resp = pm.response.json();",
+									"pm.environment.set(\"orderData\", resp.item.orderId);",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imp6WVo1Ul9HYUZnMUZKREVNU2tZdyJ9.eyJpc3MiOiJodHRwczovL2Rldi0xbmk5LW93eS51cy5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NjEyNTFkZDgzY2FhYmEwMDY5YjZkZGQwIiwiYXVkIjoiaHR0cHM6Ly9vcmRlcm1nbXRhcGkiLCJpYXQiOjE2Mjk5NDU1MzMsImV4cCI6MTYzMDAzMTkzMywiYXpwIjoic244SHdJWlRmRVJGSXFKVFI0OWxMeFVabFE1eE54bFIiLCJzY29wZSI6IndyaXRlOm9yZGVycyIsImd0eSI6InBhc3N3b3JkIn0.bIFggQnS2zNWo7AeQW2G_sKJFDNhsWol6s20lBTm-yF5kknJJna_A3TTaVHkx5-jziImjV_JwW_58gG68nR4Lwnvka5clqykRstRCXK4pqt0iZWz5lxLgEseVyoniimgqvaTWr0t_fsQC9YV7ki5hMpWFyg0tbSnS4NrjZDUfMy6s3yzAa5LA1rQW6kL1CSvLhi7X2Z5V3CBWghHmHcOFYXjMsqS34ZAdrAs8loTD7UKAzri8YHwiQ1s2vYiV6x_pDOIo1gCM0oqz87bYGS2fW1RRUp3v0mAySpvgBfuD1Fw51-loc9__cXjSBFHn7o0-DaaPkxj0EivkEwByJ_mIg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"userEmail\":\"emilylight@test.com\",\n\"productId\":\"PID0.20446245864339585\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "https://{{apiOrder}}.execute-api.us-east-1.amazonaws.com/prod/orders"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"value\", pm.environment.get(\"orderData\"));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let respUpd = pm.response.json();",
+									"",
+									"pm.test(\"Updated Order\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Quantity of order Updated\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.item.quantity).to.eql('3');",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imp6WVo1Ul9HYUZnMUZKREVNU2tZdyJ9.eyJpc3MiOiJodHRwczovL2Rldi0xbmk5LW93eS51cy5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NjEyNTFkZDgzY2FhYmEwMDY5YjZkZGQwIiwiYXVkIjoiaHR0cHM6Ly9vcmRlcm1nbXRhcGkiLCJpYXQiOjE2Mjk5NDU1MzMsImV4cCI6MTYzMDAzMTkzMywiYXpwIjoic244SHdJWlRmRVJGSXFKVFI0OWxMeFVabFE1eE54bFIiLCJzY29wZSI6IndyaXRlOm9yZGVycyIsImd0eSI6InBhc3N3b3JkIn0.bIFggQnS2zNWo7AeQW2G_sKJFDNhsWol6s20lBTm-yF5kknJJna_A3TTaVHkx5-jziImjV_JwW_58gG68nR4Lwnvka5clqykRstRCXK4pqt0iZWz5lxLgEseVyoniimgqvaTWr0t_fsQC9YV7ki5hMpWFyg0tbSnS4NrjZDUfMy6s3yzAa5LA1rQW6kL1CSvLhi7X2Z5V3CBWghHmHcOFYXjMsqS34ZAdrAs8loTD7UKAzri8YHwiQ1s2vYiV6x_pDOIo1gCM0oqz87bYGS2fW1RRUp3v0mAySpvgBfuD1Fw51-loc9__cXjSBFHn7o0-DaaPkxj0EivkEwByJ_mIg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"userEmail\":\"emilylight@test.com\",\n\"productId\":\"PID0.20446245864339585\",\n\"quantity\": \"3\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "https://{{apiOrder}}.execute-api.us-east-1.amazonaws.com/prod/orders/{{value}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Order",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"value\", pm.environment.get(\"orderData\"));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imp6WVo1Ul9HYUZnMUZKREVNU2tZdyJ9.eyJpc3MiOiJodHRwczovL2Rldi0xbmk5LW93eS51cy5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NjEyNTFkZDgzY2FhYmEwMDY5YjZkZGQwIiwiYXVkIjoiaHR0cHM6Ly9vcmRlcm1nbXRhcGkiLCJpYXQiOjE2Mjk5NDU1MzMsImV4cCI6MTYzMDAzMTkzMywiYXpwIjoic244SHdJWlRmRVJGSXFKVFI0OWxMeFVabFE1eE54bFIiLCJzY29wZSI6IndyaXRlOm9yZGVycyIsImd0eSI6InBhc3N3b3JkIn0.bIFggQnS2zNWo7AeQW2G_sKJFDNhsWol6s20lBTm-yF5kknJJna_A3TTaVHkx5-jziImjV_JwW_58gG68nR4Lwnvka5clqykRstRCXK4pqt0iZWz5lxLgEseVyoniimgqvaTWr0t_fsQC9YV7ki5hMpWFyg0tbSnS4NrjZDUfMy6s3yzAa5LA1rQW6kL1CSvLhi7X2Z5V3CBWghHmHcOFYXjMsqS34ZAdrAs8loTD7UKAzri8YHwiQ1s2vYiV6x_pDOIo1gCM0oqz87bYGS2fW1RRUp3v0mAySpvgBfuD1Fw51-loc9__cXjSBFHn7o0-DaaPkxj0EivkEwByJ_mIg"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": "https://{{apiOrder}}.execute-api.us-east-1.amazonaws.com/prod/orders/{{value}}"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product Management",
+			"item": [
+				{
+					"name": "Create Product Not Authorized",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.test(\"Not Authorized\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imp6WVo1Ul9HYUZnMUZKREVNU2tZdyJ9.eyJpc3MiOiJodHRwczovL2Rldi0xbmk5LW93eS51cy5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NjEyNTFkZDgzY2FhYmEwMDY5YjZkZGQwIiwiYXVkIjoiaHR0cHM6Ly9vcmRlcm1nbXRhcGkiLCJpYXQiOjE2Mjk5NDU1MzMsImV4cCI6MTYzMDAzMTkzMywiYXpwIjoic244SHdJWlRmRVJGSXFKVFI0OWxMeFVabFE1eE54bFIiLCJzY29wZSI6IndyaXRlOm9yZGVycyIsImd0eSI6InBhc3N3b3JkIn0.bIFggQnS2zNWo7AeQW2G_sKJFDNhsWol6s20lBTm-yF5kknJJna_A3TTaVHkx5-jziImjV_JwW_58gG68nR4Lwnvka5clqykRstRCXK4pqt0iZWz5lxLgEseVyoniimgqvaTWr0t_fsQC9YV7ki5hMpWFyg0tbSnS4NrjZDUfMy6s3yzAa5LA1rQW6kL1CSvLhi7X2Z5V3CBWghHmHcOFYXjMsqS34ZAdrAs8loTD7UKAzri8YHwiQ1s2vYiV6x_pDOIo1gCM0oqz87bYGS2fW1RRUp3v0mAySpvgBfuD1Fw51-loc9__cXjSBFHn7o0-DaaPkxj0EivkEwByJ_mIg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\":\"Baby powder\",\n\"desc\":\"Soft baby skin\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "https://{{apiOrder}}.execute-api.us-east-1.amazonaws.com/prod/products"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let resp = pm.response.json();",
+									"pm.environment.set(\"productId\", resp.item.pid);",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imp6WVo1Ul9HYUZnMUZKREVNU2tZdyJ9.eyJpc3MiOiJodHRwczovL2Rldi0xbmk5LW93eS51cy5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NjEyNTFlNTUyYzFjYzkwMDcxMDdhNDQ0IiwiYXVkIjoiaHR0cHM6Ly9vcmRlcm1nbXRhcGkiLCJpYXQiOjE2Mjk5OTUxNTQsImV4cCI6MTYzMDA4MTU1NCwiYXpwIjoic244SHdJWlRmRVJGSXFKVFI0OWxMeFVabFE1eE54bFIiLCJzY29wZSI6IndyaXRlOnByb2R1Y3RzIiwiZ3R5IjoicGFzc3dvcmQifQ.KnhIk0QV_MtXsyQ8S6pqsFPo9hoeqFaIe8g2T6_MG9Ycj3reBIINwn7y_WK-DCzNlTAMmVZcd3m-GR0dzu_Z8zd_lt4rTPhJGNNt_qE_ZmYG2EEovEHfN5IlZjzDyrFSYwBbS0dSyRLgsjIATP4L-HHR_k7cVScgvBFEaK7pPpcvfns1sNfQI5e9Lh4v6PMzBMzHKFV3cx_1RkMYZ14ZHWKATWhvNQJNciHAqEQBe5-iHaU3lN7TeQDhWYG1ZbtnUAZpi9vz50LTJ7gD-rYdJR2r2vXEKghK31L-1gqISCE0BFXMsw8W-YuvihsHINw5-oeeo2jnBHN2DGWz3uUNdQ",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\":\"Baby powder\",\n\"desc\":\"Soft baby skin\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "https://{{apiOrder}}.execute-api.us-east-1.amazonaws.com/prod/products"
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Product Upload URL",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"pId\", pm.environment.get(\"productId\"));",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let resp = pm.response.json();",
+									"pm.environment.set(\"s3URL\", resp.uploadUrl);",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imp6WVo1Ul9HYUZnMUZKREVNU2tZdyJ9.eyJpc3MiOiJodHRwczovL2Rldi0xbmk5LW93eS51cy5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NjEyNTFlNTUyYzFjYzkwMDcxMDdhNDQ0IiwiYXVkIjoiaHR0cHM6Ly9vcmRlcm1nbXRhcGkiLCJpYXQiOjE2Mjk5OTUxNTQsImV4cCI6MTYzMDA4MTU1NCwiYXpwIjoic244SHdJWlRmRVJGSXFKVFI0OWxMeFVabFE1eE54bFIiLCJzY29wZSI6IndyaXRlOnByb2R1Y3RzIiwiZ3R5IjoicGFzc3dvcmQifQ.KnhIk0QV_MtXsyQ8S6pqsFPo9hoeqFaIe8g2T6_MG9Ycj3reBIINwn7y_WK-DCzNlTAMmVZcd3m-GR0dzu_Z8zd_lt4rTPhJGNNt_qE_ZmYG2EEovEHfN5IlZjzDyrFSYwBbS0dSyRLgsjIATP4L-HHR_k7cVScgvBFEaK7pPpcvfns1sNfQI5e9Lh4v6PMzBMzHKFV3cx_1RkMYZ14ZHWKATWhvNQJNciHAqEQBe5-iHaU3lN7TeQDhWYG1ZbtnUAZpi9vz50LTJ7gD-rYdJR2r2vXEKghK31L-1gqISCE0BFXMsw8W-YuvihsHINw5-oeeo2jnBHN2DGWz3uUNdQ",
+								"type": "text"
+							}
+						],
+						"url": "https://{{apiOrder}}.execute-api.us-east-1.amazonaws.com/prod/products/{{pId}}/attachment"
+					},
+					"response": []
+				},
+				{
+					"name": "S3 Upload Test",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"s3URLGenerated\", pm.environment.get(\"s3URL\"));"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Was able to access S3 URL - 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": ""
+							}
+						},
+						"url": "{{s3URLGenerated}}"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": {}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "apiOrder",
+			"value": "abt4icvmra"
+		},
+		{
+			"key": "value",
+			"value": "\"\""
+		},
+		{
+			"key": "s3URLGenerated",
+			"value": "\"\""
+		},
+		{
+			"key": "testFile",
+			"value": null
+		}
+	]
+}
